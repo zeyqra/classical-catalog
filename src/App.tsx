@@ -8,21 +8,8 @@ type Album = {
 }
 
 type AlbumDetail = {
-  fileName: string
-  title?: string
   artist?: string
   album?: string
-  albumArtist?: string
-  year?: number
-  genre?: string[]
-  track?: {
-    no: number
-    of?: number
-  }
-  disk?: {
-    no: number
-    of?: number
-  }
 }
 
 const App = () => {
@@ -41,7 +28,7 @@ const App = () => {
 
   return (
     <main>
-      <h1>Albums</h1>
+      <h2>Albums</h2>
 
       {isLoading ? (
         <p>Loading...</p>
@@ -58,19 +45,19 @@ const App = () => {
       )}
 
       {selectedFileName !== null && (
-        <div>
-          <button onClick={() => setSelectedFileName(null)}>Close</button>
+        <div className="inset-0 fixed bg-white overflow-y-auto overscroll-contain">
+          <header className='flex justify-between'>
+            <h2>Detail</h2>
+            <button onClick={() => setSelectedFileName(null)}>Close</button>
+          </header>
 
           {isDetailLoading ? (
             <p>Loading...</p>
           ) : (
             <div>
-              <p>Title: {album?.title}</p>
-              <p>Artist: {album?.artist}</p>
-              <p>Album: {album?.album}</p>
-              <p>Album Artist: {album?.albumArtist}</p>
-              <p>Year: {album?.year}</p>
-              <p>Genre: {album?.genre?.join(', ')}</p>
+              {JSON.stringify(album)}
+              {/* <p>Artist: {album?.artist}</p>
+              <p>Album: {album?.album}</p> */}
             </div>
           )}
         </div>
