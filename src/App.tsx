@@ -8,19 +8,35 @@ type Album = {
 }
 
 type AlbumDetail = {
-  artist?: string
-  album?: string
+  title: string
+  comment: string
+  composers: {
+    name: string
+    works: {
+      title: string
+      recording: {
+        conductor: string
+        orchestra: string
+        soloist: string
+        year: string
+      }
+      movements: string[]
+    }[]
+  }[]
 }
 
 const App = () => {
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
 
-  const { data: albums, isLoading } = useQuery<Album[]>({
+  const { data: albums, isLoading: albumsLoading } = useQuery<Album[]>({
     queryKey: ['albums'],
     queryFn: () => request<Album[]>('/albums'),
   })
 
-  const { data: album, isLoading: isDetailLoading } = useQuery<AlbumDetail>({
+  const {
+    data: detail = { composers: [] },
+    isLoading: detailLoading,
+  } = useQuery<AlbumDetail>({
     queryKey: ['album', selectedFileName],
     queryFn: () => request<AlbumDetail>(`/albums/${selectedFileName}`),
     enabled: selectedFileName !== null,
@@ -28,36 +44,82 @@ const App = () => {
 
   return (
     <main>
-      <h2>Albums</h2>
+      <header>
+        <div>Albums</div>
+      </header>
 
-      {isLoading ? (
-        <p>Loading...</p>
+      {albumsLoading ? (
+        <div>Loading...</div>
       ) : (
-        <ul>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-0.5">
           {albums?.map(album => (
-            <li
+            <div
               key={album.fileName}
               onClick={() => setSelectedFileName(album.fileName)}>
-              {album.album}
-            </li>
+              <img
+                src={`http://localhost:3000${album.coverUrl}`}
+                className="aspect-square object-cover min-w-[180px]"
+                loading='lazy'
+              />
+              {/* <div className='line-clamp-2'>{album.album}</div> */}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {selectedFileName !== null && (
         <div className="inset-0 fixed bg-white overflow-y-auto overscroll-contain">
-          <header className='flex justify-between'>
-            <h2>Detail</h2>
-            <button onClick={() => setSelectedFileName(null)}>Close</button>
-          </header>
+          <button
+            onClick={() => setSelectedFileName(null)}
+            className="absolute top-1 right-1">
+            Close
+          </button>
 
-          {isDetailLoading ? (
-            <p>Loading...</p>
+          {detailLoading ? (
+            <div>Loading...</div>
           ) : (
-            <div>
-              {JSON.stringify(album)}
-              {/* <p>Artist: {album?.artist}</p>
-              <p>Album: {album?.album}</p> */}
+            <div className="">
+              <div>Album Detail</div>
+              <section className="p-1 max-w-[50vw] m-auto">
+                <section className="flex items-start">
+                  <img
+                    src={`http://localhost:3000${detail.coverUrl}`}
+                    className="w-44 mr-1"
+                  />
+                  <div>
+                    <h2 className="font-semibold">{detail.title}</h2>
+                    <p className="text-zinc-500">{detail.comment}</p>
+                  </div>
+                </section>
+
+                {detail.composers.map(composer => (
+                  <section key={composer.name} className="mt-2">
+                    <h3 className="font-semibold">{composer.name}</h3>
+
+                    {composer.works.map(work => (
+                      <div key={work.title} className="mt-1">
+                        <h3 className="font-semibold">{work.title}</h3>
+                        <h3 className="font-semibold">
+                          {[
+                            work.recording.conductor,
+                            work.recording.orchestra,
+                            work.recording.soloist,
+                          ]
+                            .filter(Boolean)
+                            .join(' / ')}
+                          {work.recording.year && ` [${work.recording.year}]`}
+                        </h3>
+
+                        <ul className="text-zinc-500">
+                          {work.movements.map(movement => (
+                            <li key={movement}>{movement}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </section>
+                ))}
+              </section>
             </div>
           )}
         </div>
