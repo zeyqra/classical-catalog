@@ -14,14 +14,30 @@ type AlbumDetail = {
     name: string
     works: {
       title: string
-      recording: {
+      track?: number
+      performers: {
         conductor: string
         orchestra: string
         soloist: string
-        year: string
       }
-      movements: string[]
+      year: string
+      movements: {
+        title: string
+        track: number
+      }[]
     }[]
+  }[]
+  tracks: {
+    track: number
+    composer: string
+    work: string
+    performers: {
+      conductor?: string
+      orchestra?: string
+      soloist?: string
+    }
+    year?: string
+    movement?: string
   }[]
 }
 
@@ -32,6 +48,14 @@ const App = () => {
     queryKey: ['albums'],
     queryFn: () => request<Album[]>('/albums'),
   })
+
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState<AlbumDetail | null>(null)
+
+  const startEditing = () => {
+    setForm(structuredClone(detail))
+    setEditing(true)
+  }
 
   const {
     data: detail = { composers: [] },
@@ -59,9 +83,8 @@ const App = () => {
               <img
                 src={`http://localhost:3000${album.coverUrl}`}
                 className="aspect-square object-cover min-w-[180px]"
-                loading='lazy'
+                loading="lazy"
               />
-              {/* <div className='line-clamp-2'>{album.album}</div> */}
             </div>
           ))}
         </div>
@@ -69,56 +92,238 @@ const App = () => {
 
       {selectedFileName !== null && (
         <div className="inset-0 fixed bg-white overflow-y-auto overscroll-contain">
-          <button
-            onClick={() => setSelectedFileName(null)}
-            className="absolute top-1 right-1">
-            Close
-          </button>
-
           {detailLoading ? (
             <div>Loading...</div>
           ) : (
             <div className="">
-              <div>Album Detail</div>
+              <div className="fixed top-0 w-full flex justify-between">
+                Album Detail
+                <div>
+                  {editing && (
+                    <>
+                      <button onClick={() => setEditing(false)}>Cancel</button>
+
+                      <button
+                        onClick={async () => {
+                          await request(`/albums/${selectedFileName}`, {
+                            method: 'PUT',
+                            body: JSON.stringify(form),
+                          })
+
+                          setEditing(false)
+                        }}>
+                        Save
+                      </button>
+                    </>
+                  )}
+                  {!editing && <button onClick={startEditing}>Edit</button>}
+                  <button onClick={() => setSelectedFileName(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
               <section className="p-1 max-w-[50vw] m-auto">
-                <section className="flex items-start">
-                  <img
-                    src={`http://localhost:3000${detail.coverUrl}`}
-                    className="w-44 mr-1"
-                  />
-                  <div>
-                    <h2 className="font-semibold">{detail.title}</h2>
-                    <p className="text-zinc-500">{detail.comment}</p>
-                  </div>
-                </section>
+                {editing && form ? (
+                  <>
+                    <input
+                      value={form.title}
+                      onChange={e =>
+                        setForm({
+                          ...form,
+                          title: e.target.value,
+                        })
+                      }
+                    />
 
-                {detail.composers.map(composer => (
-                  <section key={composer.name} className="mt-2">
-                    <h3 className="font-semibold">{composer.name}</h3>
+                    <textarea
+                      value={form.comment}
+                      onChange={e =>
+                        setForm({
+                          ...form,
+                          comment: e.target.value,
+                        })
+                      }
+                    />
 
-                    {composer.works.map(work => (
-                      <div key={work.title} className="mt-1">
-                        <h3 className="font-semibold">{work.title}</h3>
-                        <h3 className="font-semibold">
-                          {[
-                            work.recording.conductor,
-                            work.recording.orchestra,
-                            work.recording.soloist,
-                          ]
-                            .filter(Boolean)
-                            .join(' / ')}
-                          {work.recording.year && ` [${work.recording.year}]`}
-                        </h3>
+                    {form.tracks.map((track, index) => (
+                      <section key={track.track} className="mt-2">
+                        <h3 className="font-semibold">Track {track.track}</h3>
 
-                        <ul className="text-zinc-500">
-                          {work.movements.map(movement => (
-                            <li key={movement}>{movement}</li>
-                          ))}
-                        </ul>
-                      </div>
+                        <input
+                          placeholder="Composer"
+                          value={track.composer}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              composer: e.target.value,
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Work"
+                          value={track.work}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              work: e.target.value,
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Conductor"
+                          value={track.performers.conductor ?? ''}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              performers: {
+                                ...track.performers,
+                                conductor: e.target.value,
+                              },
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Orchestra"
+                          value={track.performers.orchestra ?? ''}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              performers: {
+                                ...track.performers,
+                                orchestra: e.target.value,
+                              },
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Soloist"
+                          value={track.performers.soloist ?? ''}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              performers: {
+                                ...track.performers,
+                                soloist: e.target.value,
+                              },
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Year"
+                          value={track.year ?? ''}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              year: e.target.value,
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+
+                        <input
+                          placeholder="Movement"
+                          value={track.movement ?? ''}
+                          onChange={e => {
+                            const tracks = [...form.tracks]
+                            tracks[index] = {
+                              ...track,
+                              movement: e.target.value,
+                            }
+
+                            setForm({
+                              ...form,
+                              tracks,
+                            })
+                          }}
+                        />
+                      </section>
                     ))}
-                  </section>
-                ))}
+                  </>
+                ) : (
+                  <>
+                    <section className="flex items-start">
+                      <img
+                        src={`http://localhost:3000${detail.coverUrl}`}
+                        className="w-44 mr-1"
+                      />
+                      <div>
+                        <h2 className="font-semibold">{detail.title}</h2>
+                        <p className="text-zinc-500">{detail.comment}</p>
+                      </div>
+                    </section>
+
+                    {detail.composers.map(composer => (
+                      <section key={composer.name} className="mt-2">
+                        <h3 className="font-semibold">{composer.name}</h3>
+
+                        {composer.works.map(work => (
+                          <div key={work.title} className="mt-1">
+                            <h3 className="font-semibold">{`${work.track ? work.track + ' ' : ''}${work.title}`}</h3>
+                            <h3 className="font-semibold">
+                              {[
+                                work.performers.conductor,
+                                work.performers.orchestra,
+                                work.performers.soloist,
+                              ]
+                                .filter(Boolean)
+                                .join(' / ')}
+                              {work.year &&
+                                ` [${work.year}]`}
+                            </h3>
+
+                            <ul className="text-zinc-500">
+                              {work.movements.map(movement => (
+                                <li key={movement.track + ' ' + movement.title}>
+                                  {movement.track + ' ' + movement.title}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </section>
+                    ))}
+                  </>
+                )}
               </section>
             </div>
           )}
