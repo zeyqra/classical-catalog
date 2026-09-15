@@ -122,10 +122,11 @@ const App = () => {
                   </button>
                 </div>
               </div>
-              <section className="p-1 max-w-[50vw] m-auto">
+              <section className="p-1 max-w-[680px] m-auto pt-6">
                 {editing && form ? (
                   <>
                     <input
+                      className="w-full"
                       value={form.title}
                       onChange={e =>
                         setForm({
@@ -134,8 +135,8 @@ const App = () => {
                         })
                       }
                     />
-
                     <textarea
+                      className="w-full"
                       value={form.comment}
                       onChange={e =>
                         setForm({
@@ -149,133 +150,141 @@ const App = () => {
                       <section key={track.track} className="mt-2">
                         <h3 className="font-semibold">Track {track.track}</h3>
 
-                        <input
-                          placeholder="Composer"
-                          value={track.composer}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              composer: e.target.value,
-                            }
+                        <div className="w-full flex flex-wrap">
+                          <input
+                            className="flex-1"
+                            placeholder="Composer"
+                            value={track.composer}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                composer: e.target.value,
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
 
-                        <input
-                          placeholder="Work"
-                          value={track.work}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              work: e.target.value,
-                            }
+                          <input
+                            className="flex-1"
+                            placeholder="Work"
+                            value={track.work}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                work: e.target.value,
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
+                          <input
+                            className="flex-1"
+                            placeholder="Movement"
+                            value={track.movement ?? ''}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                movement: e.target.value,
+                              }
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
+                        </div>
 
-                        <input
-                          placeholder="Conductor"
-                          value={track.performers.conductor ?? ''}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              performers: {
-                                ...track.performers,
-                                conductor: e.target.value,
-                              },
-                            }
+                        <div className="w-full flex flex-wrap">
+                          <input
+                            className="flex-1"
+                            placeholder="Conductor"
+                            value={track.performers.conductor ?? ''}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                performers: {
+                                  ...track.performers,
+                                  conductor: e.target.value,
+                                },
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
 
-                        <input
-                          placeholder="Orchestra"
-                          value={track.performers.orchestra ?? ''}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              performers: {
-                                ...track.performers,
-                                orchestra: e.target.value,
-                              },
-                            }
+                          <input
+                            className="flex-1"
+                            placeholder="Orchestra"
+                            value={track.performers.orchestra ?? ''}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                performers: {
+                                  ...track.performers,
+                                  orchestra: e.target.value,
+                                },
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
 
-                        <input
-                          placeholder="Soloist"
-                          value={track.performers.soloist ?? ''}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              performers: {
-                                ...track.performers,
-                                soloist: e.target.value,
-                              },
-                            }
+                          <input
+                            className="flex-1"
+                            placeholder="Soloist"
+                            value={track.performers.soloist ?? ''}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                performers: {
+                                  ...track.performers,
+                                  soloist: e.target.value,
+                                },
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
 
-                        <input
-                          placeholder="Year"
-                          value={track.year ?? ''}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              year: e.target.value,
-                            }
+                          <input
+                            placeholder="Year"
+                            value={track.year ?? ''}
+                            onChange={e => {
+                              const tracks = [...form.tracks]
+                              tracks[index] = {
+                                ...track,
+                                year: e.target.value,
+                              }
 
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
-
-                        <input
-                          placeholder="Movement"
-                          value={track.movement ?? ''}
-                          onChange={e => {
-                            const tracks = [...form.tracks]
-                            tracks[index] = {
-                              ...track,
-                              movement: e.target.value,
-                            }
-
-                            setForm({
-                              ...form,
-                              tracks,
-                            })
-                          }}
-                        />
+                              setForm({
+                                ...form,
+                                tracks,
+                              })
+                            }}
+                          />
+                        </div>
                       </section>
                     ))}
                   </>
@@ -284,42 +293,53 @@ const App = () => {
                     <section className="flex items-start">
                       <img
                         src={`http://localhost:3000${detail.coverUrl}`}
-                        className="w-44 mr-1"
+                        className="w-56 mr-1"
                       />
                       <div>
-                        <h2 className="font-semibold">{detail.title}</h2>
-                        <p className="text-zinc-500">{detail.comment}</p>
+                        <h2 className="font-medium">{detail.title}</h2>
+                        <p className="text-zinc-500 line-clamp-9">
+                          {detail.comment}
+                        </p>
                       </div>
                     </section>
 
                     {detail.composers.map(composer => (
-                      <section key={composer.name} className="mt-2">
-                        <h3 className="font-semibold">{composer.name}</h3>
+                      <section key={composer.name} className="mt-4">
+                        <h3 className="font-medium">{composer.name}</h3>
 
-                        {composer.works.map(work => (
-                          <div key={work.title} className="mt-1">
-                            <h3 className="font-semibold">{`${work.track ? work.track + ' ' : ''}${work.title}`}</h3>
-                            <h3 className="font-semibold">
-                              {[
-                                work.performers.conductor,
-                                work.performers.orchestra,
-                                work.performers.soloist,
-                              ]
-                                .filter(Boolean)
-                                .join(' / ')}
-                              {work.year &&
-                                ` [${work.year}]`}
-                            </h3>
+                        {composer.works.map(work => {
+                          const isSingleWork =
+                            work.movements.length === 1 &&
+                            work.movements[0]?.title === ''
+                          return (
+                            <div key={work.title} className="mt-4">
+                              <h3 className="font-medium">{`${isSingleWork ? work.movements[0].track + ' ' : ''}${work.title}`}</h3>
+                              <h3 className="font-medium">
+                                {[
+                                  work.performers.conductor,
+                                  work.performers.orchestra,
+                                  work.performers.soloist,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' / ')}
+                                {work.year && ` [${work.year}]`}
+                              </h3>
 
-                            <ul className="text-zinc-500">
-                              {work.movements.map(movement => (
-                                <li key={movement.track + ' ' + movement.title}>
-                                  {movement.track + ' ' + movement.title}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
+                              {!isSingleWork && (
+                                <ul className="mt-0">
+                                  {work.movements.map(movement => (
+                                    <li
+                                      key={
+                                        movement.track + ' ' + movement.title
+                                      }>
+                                      {movement.track + ' ' + movement.title}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )
+                        })}
                       </section>
                     ))}
                   </>
