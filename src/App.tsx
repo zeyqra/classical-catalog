@@ -409,23 +409,28 @@ const App = () => {
           </div>
         </main>
         <aside className="w-[280px] overflow-y-auto">
-          <h2 className="mb-3 font-bold">作曲家</h2>
-
+          <h2 className="font-bold">作曲家</h2>
           {stats.composers?.map(composer => (
-            <div key={composer.name} className="mb-2 flex justify-between">
-              <span>{composer.name}</span>
-              <span>{composer.workCount}</span>
+            <div
+              key={composer}
+              onClick={() =>
+                request<AlbumsResponse>(`/albums?series=${currentSeries}&composer=${composer}`)
+              }>
+              {composer}
             </div>
           ))}
 
-          <h2 className="mb-3 mt-8 font-bold">演奏者</h2>
-
-          {stats.performers?.map(performer => (
-            <div key={performer.name} className="mb-2 flex justify-between">
-              <span>{performer.name}</span>
-              <span>{performer.workCount}</span>
-            </div>
-          ))}
+          <h2 className="font-bold">演奏者</h2>
+          {Object.entries(stats.performers || {}).map(
+            ([performerType, performers]) => (
+              <div>
+                <h3>{performerType}</h3>
+                {performers.map(performer => (
+                  <div key={performer}>{performer}</div>
+                ))}
+              </div>
+            )
+          )}
         </aside>
       </div>
     </main>
