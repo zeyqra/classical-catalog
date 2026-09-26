@@ -1,12 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { request } from './utils'
 
 type Stats = {
-  composers: {
-    name: string
-    workCount: number
-  }[]
+  composers: string[]
   performers: {
     name: string
     workCount: number
@@ -59,20 +56,39 @@ type AlbumDetail = {
 }
 
 const App = () => {
+  const [albums, setAlbums] = useState([])
+  const [series, setSeries] = useState([])
+  const [stats, setStats] = useState([])
   const [currentSeries, setCurrentSeries] = useState('')
-  const { data: series } = useQuery({
-    queryKey: ['series'],
-    queryFn: () => request(`/series`),
-  })
+  const [currentComposer, setCurrentComposer] = useState('')
+  // const [currentSeries, setCurrentSeries] = useState('')
+  // const [currentSeries, setCurrentSeries] = useState('')
+  // const [currentSeries, setCurrentSeries] = useState('')
+
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
 
-  const {
-    data: { albums, stats } = { albums: [], stats: [] },
-    isLoading: albumsLoading,
-  } = useQuery<AlbumsResponse>({
-    queryKey: ['albums', currentSeries],
-    queryFn: () => request<AlbumsResponse>(`/albums?series=${currentSeries}`),
-  })
+
+  const fetchSeries = async () => {
+    setSeries(await request(`/series`))
+  }
+  const fetchAlbums = async () => {
+    let performerQuerys = ''
+    if(currentComposer) performerQuerys += `composer=${currentComposer}`
+    
+    const result = await request<AlbumsResponse>(
+      `/albums?series=${currentSeries}&${performerQuerys}`
+    )
+    setAlbums(result.albums)
+    setStats(result.stats)
+  }
+
+  useEffect(() => {
+    fetchSeries()
+  }, [])
+
+  useEffect(() => {
+    fetchAlbums()
+  }, [currentSeries, currentComposer])
   
 
   const [editing, setEditing] = useState(false)
@@ -120,7 +136,7 @@ const App = () => {
         </aside>
         <main className="flex-1 relative">
           <div className="h-full overflow-y-auto">
-            {albumsLoading ? (
+            {false ? (
               <div>Loading...</div>
             ) : (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-0.5">
@@ -414,7 +430,7 @@ const App = () => {
             <div
               key={composer}
               onClick={() =>
-                request<AlbumsResponse>(`/albums?series=${currentSeries}&composer=${composer}`)
+                setCurrentComposer(composer)
               }>
               {composer}
             </div>
@@ -426,7 +442,15 @@ const App = () => {
               <div>
                 <h3>{performerType}</h3>
                 {performers.map(performer => (
-                  <div key={performer}>{performer}</div>
+                  <div
+                    key={performer}
+                    onClick={() =>
+                      request<AlbumsResponse>(
+                        `/albums?series=${currentSeries}&${performerType}=${performer}`
+                      )
+                    }>
+                    {performer}
+                  </div>
                 ))}
               </div>
             )
